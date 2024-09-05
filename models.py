@@ -23,9 +23,10 @@ class User(db.Model):
     rut = db.Column(db.String(12), unique=True, nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
     password = db.Column(db.String(255), nullable=False)
+    phone = db.Column(db.String(15), nullable=True)  # New field
     role_id = db.Column(db.Integer, db.ForeignKey('role.id'), nullable=False)
-    registration_date = db.Column(db.DateTime, default='CURRENT_TIMESTAMP')
-    
+    registration_date = db.Column(db.DateTime, default=db.func.current_timestamp())
+
     role = db.relationship("Role")
 
     def serialize(self):
@@ -35,6 +36,7 @@ class User(db.Model):
             "last_name": self.last_name,
             "rut": self.rut,
             "email": self.email,
+            "phone": self.phone,
             "role": self.role.serialize(),
             "registration_date": self.registration_date
         }
@@ -49,7 +51,7 @@ class Campsite(db.Model):
     rules = db.Column(db.Text, nullable=True)
     map_url = db.Column(db.String(255), nullable=True)
     image = db.Column(db.String(100), nullable=True)
-    
+
     provider = db.relationship("User")
     services = db.relationship("Service", back_populates="campsite")
     zones = db.relationship("Site", back_populates="campsite")
@@ -76,7 +78,7 @@ class Price(db.Model):
     __tablename__ = 'price'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     campsite_id = db.Column(db.Integer, db.ForeignKey('campsite.id'), nullable=False)
-    amount_per_day = db.Column(db.DECIMAL(10, 2), nullable=False, default=10000)
+    amount_per_day = db.Column(db.Numeric(10, 2), nullable=False, default=10000)
 
     campsite = db.relationship("Campsite", back_populates="prices")
 
@@ -96,11 +98,7 @@ class Reservation(db.Model):
     start_date = db.Column(db.Date, nullable=False)
     end_date = db.Column(db.Date, nullable=False)
     number_of_people = db.Column(db.Integer, nullable=False)
-    reservation_date = db.Column(db.DateTime, default='CURRENT_TIMESTAMP')
-    
-    full_name = db.Column(db.String(200), nullable=False)
-    contact_number = db.Column(db.String(15), nullable=False)
-    contact_email = db.Column(db.String(100), nullable=False)
+    reservation_date = db.Column(db.DateTime, default=db.func.current_timestamp())
 
     user = db.relationship("User")
     campsite = db.relationship("Campsite")
@@ -116,9 +114,6 @@ class Reservation(db.Model):
             "end_date": self.end_date,
             "number_of_people": self.number_of_people,
             "reservation_date": self.reservation_date,
-            "full_name": self.full_name,
-            "contact_number": self.contact_number,
-            "contact_email": self.contact_email,
         }
 
 class Review(db.Model):
@@ -128,8 +123,8 @@ class Review(db.Model):
     campsite_id = db.Column(db.Integer, db.ForeignKey('campsite.id'), nullable=False)
     comment = db.Column(db.Text, nullable=True)
     rating = db.Column(db.Integer, nullable=False)
-    date = db.Column(db.DateTime, default='CURRENT_TIMESTAMP')
-    
+    date = db.Column(db.DateTime, default=db.func.current_timestamp())
+
     user = db.relationship("User")
     campsite = db.relationship("Campsite")
 
@@ -147,7 +142,7 @@ class ServiceDetail(db.Model):
     __tablename__ = 'service_detail'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(100), nullable=False)
-    price = db.Column(db.DECIMAL(10, 2), nullable=False)
+    price = db.Column(db.Numeric(10, 2), nullable=False)
 
     def serialize(self):
         return {
@@ -161,7 +156,7 @@ class Service(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     campsite_id = db.Column(db.Integer, db.ForeignKey('campsite.id'), nullable=False)
     service_id = db.Column(db.Integer, db.ForeignKey('service_detail.id'), nullable=False)
-    
+
     campsite = db.relationship("Campsite", back_populates="services")
     service_detail = db.relationship("ServiceDetail")
 
@@ -177,9 +172,8 @@ class Site(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(100), nullable=False)
     campsite_id = db.Column(db.Integer, db.ForeignKey('campsite.id'), nullable=False)
-    status = db.Column(Enum('available', 'unavailable', name='site_status'), default='available')
+    status = db.Column(db.Enum('available', 'unavailable', name='site_status'), default='available')
     max_of_people = db.Column(db.Integer, nullable=False)
-    
 
     campsite = db.relationship("Campsite", back_populates="zones")
 
@@ -192,20 +186,33 @@ class Site(db.Model):
             "max_of_people": self.max_of_people,
         }
 
-class CampsiteDetail(db.Model):
-    __tablename__ = 'campsite_detail'
+class CampsiteImage(db.Model):
+    __tablename__ = 'campsite_image'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     campsite_id = db.Column(db.Integer, db.ForeignKey('campsite.id'), nullable=False)
     image = db.Column(db.String(100), nullable=False)
-    rule = db.Column(db.Text, nullable=True)
-    
-    campsite = db.relationship("Campsite", back_populates="details")
+
+    campsite = db.relationship("Campsite")
 
     def serialize(self):
         return {
             "id": self.id,
             "campsite_id": self.campsite_id,
             "image": self.image,
+        }
+
+class CampsiteRule(db.Model):
+    __tablename__ = 'campsite_rule'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    campsite_id = db.Column(db.Integer, db.ForeignKey('campsite.id'), nullable=False)
+    rule = db.Column(db.Text, nullable=True)
+
+    campsite = db.relationship("Campsite")
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "campsite_id": self.campsite_id,
             "rule": self.rule,
         }
 
@@ -214,7 +221,7 @@ class ReservationDetail(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     reservation_id = db.Column(db.Integer, db.ForeignKey('reservation.id'), nullable=False)
     service_id = db.Column(db.Integer, db.ForeignKey('service_detail.id'), nullable=False)
-    
+
     reservation = db.relationship("Reservation")
     service_detail = db.relationship("ServiceDetail")
 
