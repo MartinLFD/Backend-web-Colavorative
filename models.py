@@ -179,6 +179,7 @@ class Site(db.Model):
     campsite_id = db.Column(db.Integer, db.ForeignKey('campsite.id'), nullable=False)
     status = db.Column(Enum('available', 'unavailable', name='site_status'), default='available')
     max_of_people = db.Column(db.Integer, nullable=False)
+    
 
     campsite = db.relationship("Campsite", back_populates="zones")
 
