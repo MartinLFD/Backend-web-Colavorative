@@ -70,7 +70,7 @@ class Campsite(db.Model):
             "image": self.image,
         }
         
-class SummerOffer(db.Model):
+class Offers(db.Model):
     __tablename__ = 'summer_offer'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     campsite_id = db.Column(db.Integer, ForeignKey('campsite.id'), nullable=False)
@@ -199,6 +199,7 @@ class Service(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     campsite_id = db.Column(db.Integer, ForeignKey('campsite.id'), nullable=False)
     category_id = db.Column(db.Integer, ForeignKey('service_category.id'), nullable=False)
+    price_by_service = db.Column(db.Integer, nullable = False)
 
     campsite = relationship("Campsite", back_populates="services")
     category = relationship("ServiceCategory")
@@ -208,6 +209,7 @@ class Service(db.Model):
             "id": self.id,
             "campsite_id": self.campsite_id,
             "category_id": self.category_id,
+            "price_by_service": self.price_by_service,
         }
     
 class Site(db.Model):
