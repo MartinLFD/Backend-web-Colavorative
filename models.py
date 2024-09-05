@@ -54,9 +54,6 @@ class Campsite(db.Model):
     services = relationship("Service", back_populates="campsite")
     zones = relationship("Site", back_populates="campsite")
     details = relationship("CampsiteDetail", back_populates="campsite")
-    summer_offers = relationship("SummerOffer", back_populates="campsite")
-    winter_offers = relationship("WinterOffer", back_populates="campsite")
-    special_offers = relationship("SpecialOffer", back_populates="campsite")
 
     def serialize(self):
         return {
@@ -68,70 +65,6 @@ class Campsite(db.Model):
             "rules": self.rules,
             "map_url": self.map_url,
             "image": self.image,
-        }
-        
-class Offers(db.Model):
-    __tablename__ = 'summer_offer'
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    campsite_id = db.Column(db.Integer, ForeignKey('campsite.id'), nullable=False)
-    offer_name = db.Column(db.String(100), nullable=False)
-    discount_percentage = db.Column(DECIMAL(5, 2), nullable=False)
-    valid_from = db.Column(db.Date, nullable=False)
-    valid_until = db.Column(db.Date, nullable=False)
-    
-    campsite = relationship("Campsite", back_populates="summer_offers")
-
-    def serialize(self): 
-        return {
-            "id": self.id,
-            "campsite_id": self.campsite_id,
-            "offer_name": self.offer_name,
-            "discount_percentage": self.discount_percentage,
-            "valid_from": self.valid_from,
-            "valid_until": self.valid_until,
-        }
-
-class WinterOffer(db.Model):
-    __tablename__ = 'winter_offer'
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    campsite_id = db.Column(db.Integer, ForeignKey('campsite.id'), nullable=False)
-    offer_name = db.Column(db.String(100), nullable=False)
-    discount_percentage = db.Column(DECIMAL(5, 2), nullable=False)
-    valid_from = db.Column(db.Date, nullable=False)
-    valid_until = db.Column(db.Date, nullable=False)
-    
-    campsite = relationship("Campsite", back_populates="winter_offers")
-
-    def serialize(self):
-        return {
-            "id": self.id,
-            "campsite_id": self.campsite_id,
-            "offer_name": self.offer_name,
-            "discount_percentage": self.discount_percentage,
-            "vaild_from": self.valid_from,
-            "valid_until": self.valid_until,
-        }
-
-class SpecialOffer(db.Model):
-    __tablename__ = 'special_offer'
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    campsite_id = db.Column(db.Integer, ForeignKey('campsite.id'), nullable=False)
-    offer_name = db.Column(db.String(100), nullable=False)
-    discount_percentage = db.Column(DECIMAL(5, 2), nullable=False)
-    valid_from = db.Column(db.Date, nullable=False)
-    valid_until = db.Column(db.Date, nullable=False)
-    
-    campsite = relationship("Campsite", back_populates="special_offers")
-
-    def serialize(self):
-        return {
-            "id": self.id,
-            "campsite_id": self.campsite_id,
-            "offer_name": self.offer_name,
-            "discount_percentage": self.discount_percentage,
-            "valid_from": self.valid_from,
-            "valid_until": self.valid_until,
-
         }
 
 class Reservation(db.Model):
