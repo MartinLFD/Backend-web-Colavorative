@@ -304,6 +304,9 @@ def delete_site(id):
     db.session.commit()
     return jsonify({"message": "Site deleted"}), 200
 
-# Run the app
+
+
+
+# Correr la aplicacion
 if __name__== "__main__":
     app.run(host="localhost", port=4000, debug=True)
