@@ -61,7 +61,7 @@ class Camping(db.Model):
     services = db.Column(JSON, nullable=True)  # Servicios en JSON
     provider = relationship("User")
     zones = relationship("Site", back_populates="camping")
-    details = relationship("CampingDetail", back_populates="camping")
+    
 
     def serialize(self):
         return {
