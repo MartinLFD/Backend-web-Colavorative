@@ -20,3 +20,9 @@ def home():
 
 if __name__== "__main__":
     app.run(host = "localhost", port=4000, debug=True)
+
+
+
+
+# role, user, campsite, site, service, service-detail, price, 
+# POST - GET (methods)  

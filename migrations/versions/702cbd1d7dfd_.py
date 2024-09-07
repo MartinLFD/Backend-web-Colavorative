@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 41046fc0aeb7
+Revision ID: 702cbd1d7dfd
 Revises: 
-Create Date: 2024-09-04 20:39:25.865592
+Create Date: 2024-09-06 21:46:10.409587
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '41046fc0aeb7'
+revision = '702cbd1d7dfd'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -23,12 +23,6 @@ def upgrade():
     sa.Column('name', sa.String(length=50), nullable=False),
     sa.PrimaryKeyConstraint('id')
     )
-    op.create_table('service_detail',
-    sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
-    sa.Column('name', sa.String(length=100), nullable=False),
-    sa.Column('price', sa.DECIMAL(precision=10, scale=2), nullable=False),
-    sa.PrimaryKeyConstraint('id')
-    )
     op.create_table('user',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('first_name', sa.String(length=100), nullable=False),
@@ -36,6 +30,7 @@ def upgrade():
     sa.Column('rut', sa.String(length=12), nullable=False),
     sa.Column('email', sa.String(length=100), nullable=False),
     sa.Column('password', sa.String(length=255), nullable=False),
+    sa.Column('phone', sa.String(length=15), nullable=True),
     sa.Column('role_id', sa.Integer(), nullable=False),
     sa.Column('registration_date', sa.DateTime(), nullable=True),
     sa.ForeignKeyConstraint(['role_id'], ['role.id'], ),
@@ -43,31 +38,24 @@ def upgrade():
     sa.UniqueConstraint('email'),
     sa.UniqueConstraint('rut')
     )
-    op.create_table('campsite',
+    op.create_table('camping',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('provider_id', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(length=100), nullable=False),
-    sa.Column('location', sa.String(length=255), nullable=False),
+    sa.Column('rut_del_negocio', sa.String(length=12), nullable=False),
+    sa.Column('razon_social', sa.String(length=100), nullable=False),
+    sa.Column('comuna_id', sa.Integer(), nullable=False),
+    sa.Column('region', sa.String(length=50), nullable=False),
+    sa.Column('telefono', sa.String(length=15), nullable=False),
+    sa.Column('direccion', sa.String(length=255), nullable=False),
+    sa.Column('url_web', sa.String(length=255), nullable=True),
+    sa.Column('url_google_maps', sa.String(length=255), nullable=True),
     sa.Column('description', sa.Text(), nullable=True),
-    sa.Column('rules', sa.Text(), nullable=True),
-    sa.Column('map_url', sa.String(length=255), nullable=True),
-    sa.Column('image', sa.String(length=100), nullable=True),
+    sa.Column('rules', sa.JSON(), nullable=True),
+    sa.Column('main_image', sa.JSON(), nullable=True),
+    sa.Column('images', sa.JSON(), nullable=True),
+    sa.Column('services', sa.JSON(), nullable=True),
     sa.ForeignKeyConstraint(['provider_id'], ['user.id'], ),
-    sa.PrimaryKeyConstraint('id')
-    )
-    op.create_table('campsite_detail',
-    sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
-    sa.Column('campsite_id', sa.Integer(), nullable=False),
-    sa.Column('image', sa.String(length=100), nullable=False),
-    sa.Column('rule', sa.Text(), nullable=True),
-    sa.ForeignKeyConstraint(['campsite_id'], ['campsite.id'], ),
-    sa.PrimaryKeyConstraint('id')
-    )
-    op.create_table('price',
-    sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
-    sa.Column('campsite_id', sa.Integer(), nullable=False),
-    sa.Column('amount_per_day', sa.DECIMAL(precision=10, scale=2), nullable=False),
-    sa.ForeignKeyConstraint(['campsite_id'], ['campsite.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('review',
@@ -77,16 +65,8 @@ def upgrade():
     sa.Column('comment', sa.Text(), nullable=True),
     sa.Column('rating', sa.Integer(), nullable=False),
     sa.Column('date', sa.DateTime(), nullable=True),
-    sa.ForeignKeyConstraint(['campsite_id'], ['campsite.id'], ),
+    sa.ForeignKeyConstraint(['campsite_id'], ['camping.id'], ),
     sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
-    sa.PrimaryKeyConstraint('id')
-    )
-    op.create_table('service',
-    sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
-    sa.Column('campsite_id', sa.Integer(), nullable=False),
-    sa.Column('service_id', sa.Integer(), nullable=False),
-    sa.ForeignKeyConstraint(['campsite_id'], ['campsite.id'], ),
-    sa.ForeignKeyConstraint(['service_id'], ['service_detail.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('site',
@@ -95,32 +75,24 @@ def upgrade():
     sa.Column('campsite_id', sa.Integer(), nullable=False),
     sa.Column('status', sa.Enum('available', 'unavailable', name='site_status'), nullable=True),
     sa.Column('max_of_people', sa.Integer(), nullable=False),
-    sa.ForeignKeyConstraint(['campsite_id'], ['campsite.id'], ),
+    sa.Column('price', sa.DECIMAL(precision=10, scale=2), nullable=False),
+    sa.Column('facilities', sa.JSON(), nullable=True),
+    sa.Column('dimensions', sa.JSON(), nullable=True),
+    sa.ForeignKeyConstraint(['campsite_id'], ['camping.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('reservation',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('user_id', sa.Integer(), nullable=False),
-    sa.Column('campsite_id', sa.Integer(), nullable=False),
     sa.Column('site_id', sa.Integer(), nullable=False),
     sa.Column('start_date', sa.Date(), nullable=False),
     sa.Column('end_date', sa.Date(), nullable=False),
     sa.Column('number_of_people', sa.Integer(), nullable=False),
     sa.Column('reservation_date', sa.DateTime(), nullable=True),
-    sa.Column('full_name', sa.String(length=200), nullable=False),
-    sa.Column('contact_number', sa.String(length=15), nullable=False),
-    sa.Column('contact_email', sa.String(length=100), nullable=False),
-    sa.ForeignKeyConstraint(['campsite_id'], ['campsite.id'], ),
+    sa.Column('selected_services', sa.JSON(), nullable=True),
+    sa.Column('total_amount', sa.DECIMAL(precision=10, scale=2), nullable=False),
     sa.ForeignKeyConstraint(['site_id'], ['site.id'], ),
     sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
-    sa.PrimaryKeyConstraint('id')
-    )
-    op.create_table('reservation_detail',
-    sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
-    sa.Column('reservation_id', sa.Integer(), nullable=False),
-    sa.Column('service_id', sa.Integer(), nullable=False),
-    sa.ForeignKeyConstraint(['reservation_id'], ['reservation.id'], ),
-    sa.ForeignKeyConstraint(['service_id'], ['service_detail.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     # ### end Alembic commands ###
@@ -128,15 +100,10 @@ def upgrade():
 
 def downgrade():
     # ### commands auto generated by Alembic - please adjust! ###
-    op.drop_table('reservation_detail')
     op.drop_table('reservation')
     op.drop_table('site')
-    op.drop_table('service')
     op.drop_table('review')
-    op.drop_table('price')
-    op.drop_table('campsite_detail')
-    op.drop_table('campsite')
+    op.drop_table('camping')
     op.drop_table('user')
-    op.drop_table('service_detail')
     op.drop_table('role')
     # ### end Alembic commands ###
