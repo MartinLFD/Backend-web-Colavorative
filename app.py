@@ -3,6 +3,7 @@ from models import db
 from flask_migrate import Migrate
 from flask_cors import CORS
 from models import Role, User, Camping, Reservation, Review, Site
+from datetime import datetime
 
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///camping.db"
@@ -65,7 +66,8 @@ def create_user():
         email=data["email"],
         password=data["password"],
         phone=data.get("phone"),
-        role_id=data["role_id"]
+        role_id=data["role_id"],
+        registration_date=datetime.now()
     )
     db.session.add(user)
     db.session.commit()
@@ -302,6 +304,9 @@ def delete_site(id):
     db.session.commit()
     return jsonify({"message": "Site deleted"}), 200
 
-# Run the app
+
+
+
+# Correr la aplicacion
 if __name__== "__main__":
     app.run(host="localhost", port=4000, debug=True)
