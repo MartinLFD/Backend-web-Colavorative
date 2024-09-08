@@ -35,7 +35,7 @@ def get_roles():
     return jsonify([role.serialize() for role in roles])
 
 @app.route("/role/<int:id>", methods=["PUT"])
-def update_role(id):
+def update_role(id): 
     data = request.get_json()
     role = Role.query.get(id)
     if not role:
@@ -310,3 +310,4 @@ def delete_site(id):
 # Correr la aplicacion
 if __name__== "__main__":
     app.run(host="localhost", port=4000, debug=True)
+# Hola soy martin 
