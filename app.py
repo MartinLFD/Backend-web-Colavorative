@@ -114,7 +114,7 @@ def create_camping():
         name=data["name"],
         rut_del_negocio=data["rut_del_negocio"],
         razon_social=data["razon_social"],
-        comuna_id=data["comuna_id"],
+        comuna=data["comuna"],
         region=data["region"],
         telefono=data["telefono"],
         direccion=data["direccion"],
