@@ -48,7 +48,7 @@ class Camping(db.Model):
     name = db.Column(db.String(100), nullable=False)
     rut_del_negocio = db.Column(db.String(12), nullable=False)
     razon_social = db.Column(db.String(100), nullable=False)
-    comuna_id = db.Column(db.Integer, nullable=False)
+    comuna = db.Column(db.String(50), nullable=False)
     region = db.Column(db.String(50), nullable=False)
     telefono = db.Column(db.String(15), nullable=False)
     direccion = db.Column(db.String(255), nullable=False)
@@ -70,7 +70,7 @@ class Camping(db.Model):
             "name": self.name,
             "rut_del_negocio": self.rut_del_negocio,
             "razon_social": self.razon_social,
-            "comuna_id": self.comuna_id,
+            "comuna": self.comuna,
             "region": self.region,
             "telefono": self.telefono,
             "direccion": self.direccion,
@@ -84,6 +84,8 @@ class Camping(db.Model):
             "zones": [zone.serialize() for zone in self.zones],
             "details": [detail.serialize() for detail in self.details],
         }
+    
+    # Revisar tabla serializada 
 
 class Reservation(db.Model):
     __tablename__ = 'reservation'
